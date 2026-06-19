@@ -1,0 +1,3924 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Voting Intention Survey Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style>
+        body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.6;
+            font-family: sans-serif;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 48px;
+            margin-bottom: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 24px;
+        }
+        .intro {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #eee;
+        }
+        .writeup {
+            font-size: 14px;
+            color: #444;
+            margin-top: 16px;
+            margin-bottom: 32px;
+        }
+        .chart-container {
+            margin: 24px 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            background-color: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>UK Voting Intention Survey Analysis</h1>
+    <div class="intro">
+        <p>SHGH Technical Task</p>
+        <p>Tiffany Lam</p>
+        <p>Analysis of a survey of 1468 UK respondents examining voting intention and the demographic, attitudinal, and behavioural factors that predict it. A logistic regression model (L2 regularisation) was trained to predict how respondents would vote if there was a general election tomorrow.</p>
+    </div>
+
+    <!-- SECTION 1 -->
+    <h2>1. How Would Respondents Vote?</h2>
+    <div class="chart-container" id="vote_dis"></div>
+    <div class="writeup">
+        Labour leads with 20% of respondents, followed by Conservative (18%), Another Party (15%), and Liberal Democrat (12%). Notably, around 1 in 3 respondents either said they don't know how they would vote (19%) or would not vote (12%), representing a substantial pool of persuadable or disengaged voters that parties could potentially mobilise. SNP (3%), Plaid Cymru (1%), and Rather not say (1%) represent smaller shares, reflecting their regional concentration and the sensitivity of vote disclosure for some respondents.
+    </div>
+
+    <!-- SECTION 2 -->
+    <h2>2. Voting Intention by Subgroup</h2>
+    <div class="chart-container" id="subgroup"></div>
+    <div class="writeup">
+        <p>Voting intention patterns are broadly consistent across subgroups, with Labour and Conservative leading in most groups. A few patterns stand out.</p>
+        <p>Political engagement shows a clear relationship with voting behaviour. 63% of respondents with no political interest said they would not vote, compared to just 2% of the most engaged. EU referendum vote is also strongly differentiated, with Remain voters favouring Labour (31%) and Liberal Democrat (21%), while Leave voters lean toward Conservative (27%) and Another party (28%). Respondents who did not answer the EU referendum question show the highest rate of would not vote (33%), reflecting that non-response across survey questions tends to reflect broader political disengagement.</p>
+        <p>Conservative support increases with both age and income, peaking at 30% among those 65 and over and 33% among the highest earners. Labour shows the opposite age pattern, strongest among 25-34 year olds (31%) and declining steadily with age.</p>
+        <p>Regionally, Scotland and Wales show distinct patterns. SNP takes 35% of Scottish respondents and Plaid Cymru 15% of Welsh respondents, with near zero-support elsewhere.</p>
+    </div>
+
+    <!-- SECTION 3 -->
+    <h2>3. What Predicts Voting Intention?</h2>
+    <div class="writeup">
+        To understand what drives voting intention, a logistic regression with L2 regularisation was trained on the survey data. This model estimates the probability of each outcome, in this case which party a respondent would vote for, based on a set of input features. This was chosen because its results are easy to interpret: each feature produces a coefficient that shows how strongly and in which direction it is associated with voting for a given party. A regularisation technique (L2) was applied to improve the reliability of these estimates by producing more stable and generalisable coefficients.
+    </div>
+    <div class="chart-container" id="predictors"></div>
+    <div class="writeup">
+        Looking at average feature importance across all parties, the three strongest predictors are region (Scotland), political interest, and health status, which score notably higher than all other features. The fourth strongest predictor scores around 40% lower. The dominance of Scotland reflects the concentration of SNP voters in the region, as identified in the subgroup analysis. Political interest similarly mirrors the patterns observed earlier, where low engagement strongly predicts non-voting or undecided responses. The prominence of health status is a more unexpected finding, suggesting that respondents who have a health issue or disability that affects their employment are meaningfully differentiated in their voting behaviour across parties.
+    </div>
+
+    <!-- SECTION 4 -->
+    <h2>4. Predictors by Party</h2>
+    <div class="chart-container" id="coef"></div>
+    <div class="writeup">
+        <p>Examining the top 10 predictors for each party reveals distinct profiles.</p>
+        <p><strong>Labour:</strong> Scotland is the strongest predictor but negatively, reflecting SNP competition. Prioritising poverty reduction and regular public transport use are the strongest positive predictors, consistent with Labour's urban voter base. 
+        <p><strong>Conservative:</strong> Higher income is the strongest predictor, followed by attitudes favouring welfare reduction. Health disability is the strongest negative predictor, potentially reflecting concerns about public service provision.</p>
+        <p><strong>Liberal Democrat:</strong> Support for international partnerships is the strongest predictor, followed by agreement that British interests should come first. The British First finding is counterintuitive and should be interpreted with caution given small sample sizes. Health disability is the strongest negative predictor.</p>
+        <p><strong>SNP:</strong> Scotland dominates with a coefficient of 2.25, more than double the next strongest predictor. Health disability is positively associated with SNP voting, while prioritising good health and wellbeing is negatively associated. Given a smaller share of respondents, these patterns should be interpreted with caution.</p>
+        <p><strong>Plaid Cymru:</strong> Wales dominates with a coefficient of 1.30. Health disability and parents living nearby are also positively associated. Given only 11 survey respondents voted Plaid Cymru, these patterns should be interpreted with caution.</p>
+        <p><strong>Don't know:</strong> Poverty priority attitudes and female gender are the strongest positive predictors, suggesting these characteristics are associated with higher voting uncertainty. Health disability, Scotland, and strong agreement that British interests should come first all decrease likelihood of uncertainty, suggesting these groups have clearer voting intentions.</p>
+        <p><strong>Would not vote:</strong> Low political interest is the strongest predictor, with a coefficient nearly twice the next strongest predictor. EU referendum non-response also increases likelihood of not voting, reinforcing the disengagement pattern identified throughout the analysis.</p>
+        <p><strong>Rather not say:</strong> Income privacy is the strongest positive predictor, consistent with a broader pattern of privacy-conscious respondents. Given only 9 survey respondents selected Rather not say, these patterns should be interpreted with caution.</p>
+    </div>
+
+    <!-- SECTION 5 -->
+    <h2>5. Model Performance</h2>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Score</th>
+        </tr>
+        <tr>
+            <td>Accuracy</td>
+            <td>32.7%</td>
+        </tr>
+        <tr>
+            <td>Macro F1</td>
+            <td>27.0%</td>
+        </tr>
+        <tr>
+            <td>Random Baseline (8 classes)</td>
+            <td>11.1%</td>
+        </tr>
+    </table>
+    <div class="writeup">
+        <p>Accuracy measures the proportion of respondents whose voting intention was correctly predicted. The model achieves 33%, meaning 1 in 3 respondents are correctly predicted. Macro F1 averages performance across all eight parties equally, making it a more honest measure for this dataset given the large differences in party size. The model achieves 27% macro F1, lower than accuracy as it is pulled down by poor performance on smaller parties. Both metrics are substantially above the random baseline of approximately 12.5%, expected from random guessing across eight equally likely parties.</p>
+        <p>Performance varies across parties. The model predicts voting intention more reliably for smaller, geographically concentrated parties like SNP than for major parties, where survey characteristics alone are less distinguishing.</p>
+        <p>As an additional check, a Random Forest model was also tested. Unlike logistic regression, Random Forest can capture more complex, non-linear relationships. Both models produced comparable accuracy, suggesting the patterns identified are robust to the choice of modelling approach.</p>
+        <p>The model's moderate performance reflects the inherent difficulty of predicting voting intention from survey data alone. Voting behaviour is shaped by many factors not captured here, including media consumption, local candidate quality, and recent political events. Nevertheless, the model meaningfully outperforms random guessing and its coefficients reveal interpretable, politically coherent patterns that align with known dynamics in UK electoral behaviour.</p>
+    </div>
+
+    <script>
+        vegaEmbed('#vote_dis', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-cf05e8fd7752d15fe305a8e16cc9db38"
+  },
+  "datasets": {
+    "data-cf05e8fd7752d15fe305a8e16cc9db38": [
+      {
+        "colour": "#E4003B",
+        "count": 293,
+        "party": "Labour",
+        "pct": 19.96
+      },
+      {
+        "colour": "#888888",
+        "count": 276,
+        "party": "Don't know",
+        "pct": 18.8
+      },
+      {
+        "colour": "#0087DC",
+        "count": 265,
+        "party": "Conservative",
+        "pct": 18.05
+      },
+      {
+        "colour": "#B0B0B0",
+        "count": 219,
+        "party": "Another party",
+        "pct": 14.92
+      },
+      {
+        "colour": "#FAA61A",
+        "count": 179,
+        "party": "Liberal Democrat",
+        "pct": 12.19
+      },
+      {
+        "colour": "#505050",
+        "count": 173,
+        "party": "Would not vote",
+        "pct": 11.78
+      },
+      {
+        "colour": "#FDF38E",
+        "count": 43,
+        "party": "SNP",
+        "pct": 2.93
+      },
+      {
+        "colour": "#005B54",
+        "count": 11,
+        "party": "Plaid Cymru",
+        "pct": 0.75
+      },
+      {
+        "colour": "#505050",
+        "count": 9,
+        "party": "Rather not say",
+        "pct": 0.61
+      }
+    ]
+  },
+  "height": 400,
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "party",
+          "legend": null,
+          "scale": {
+            "domain": [
+              "Labour",
+              "Conservative",
+              "Liberal Democrat",
+              "SNP",
+              "Plaid Cymru",
+              "Another party",
+              "Don't know",
+              "Would not vote",
+              "Rather not say"
+            ],
+            "range": [
+              "#E4003B",
+              "#0087DC",
+              "#FAA61A",
+              "#FDF38E",
+              "#005B54",
+              "#B0B0B0",
+              "#888888",
+              "#505050",
+              "#505050"
+            ]
+          },
+          "type": "nominal"
+        },
+        "tooltip": [
+          {
+            "field": "party",
+            "title": "Party",
+            "type": "nominal"
+          },
+          {
+            "field": "count",
+            "title": "Respondents",
+            "type": "quantitative"
+          },
+          {
+            "field": "pct",
+            "format": ".2f",
+            "title": "Share (%)",
+            "type": "quantitative"
+          }
+        ],
+        "x": {
+          "axis": {
+            "grid": false,
+            "labelAngle": -30,
+            "title": "Party"
+          },
+          "field": "party",
+          "sort": "-y",
+          "type": "nominal"
+        },
+        "y": {
+          "axis": {
+            "grid": false,
+            "title": ""
+          },
+          "field": "count",
+          "scale": {
+            "domain": [
+              0,
+              305
+            ]
+          },
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "type": "bar"
+      },
+      "title": {
+        "anchor": "start",
+        "fontSize": 15,
+        "fontWeight": "bold",
+        "subtitle": [
+          "Around 1 in 3 respondents are undecided or unlikely to vote",
+          "",
+          "Number of Respondents"
+        ],
+        "subtitleFontSize": 13,
+        "text": "Labour is the most popular party, though many respondents remain undecided"
+      }
+    },
+    {
+      "encoding": {
+        "color": {
+          "value": "black"
+        },
+        "text": {
+          "field": "count",
+          "type": "quantitative"
+        },
+        "tooltip": [
+          {
+            "field": "party",
+            "title": "Party",
+            "type": "nominal"
+          },
+          {
+            "field": "count",
+            "title": "Respondents",
+            "type": "quantitative"
+          },
+          {
+            "field": "pct",
+            "format": ".2f",
+            "title": "Share (%)",
+            "type": "quantitative"
+          }
+        ],
+        "x": {
+          "axis": {
+            "grid": false,
+            "labelAngle": -30,
+            "title": "Party"
+          },
+          "field": "party",
+          "sort": "-y",
+          "type": "nominal"
+        },
+        "y": {
+          "axis": {
+            "grid": false,
+            "title": ""
+          },
+          "field": "count",
+          "scale": {
+            "domain": [
+              0,
+              305
+            ]
+          },
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "align": "center",
+        "baseline": "bottom",
+        "dy": -2,
+        "fontSize": 11,
+        "type": "text"
+      },
+      "title": {
+        "anchor": "start",
+        "fontSize": 15,
+        "fontWeight": "bold",
+        "subtitle": [
+          "Around 1 in 3 respondents are undecided or unlikely to vote",
+          "",
+          "Number of Respondents"
+        ],
+        "subtitleFontSize": 13,
+        "text": "Labour is the most popular party, though many respondents remain undecided"
+      }
+    }
+  ],
+  "width": 600
+}, {actions: false});
+        vegaEmbed('#subgroup', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-bc8d3fb2b05fef40a7dc01798298405c"
+  },
+  "datasets": {
+    "data-bc8d3fb2b05fef40a7dc01798298405c": [
+      {
+        "count": 154,
+        "pct": 27.55,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 148,
+        "pct": 26.48,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 117,
+        "pct": 20.93,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 67,
+        "pct": 11.99,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 23,
+        "pct": 4.11,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 3,
+        "pct": 0.54,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 1,
+        "pct": 0.18,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 10,
+        "pct": 1.79,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 36,
+        "pct": 6.44,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Leave",
+        "total": 559,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 23,
+        "pct": 6.35,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 34,
+        "pct": 9.39,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 75,
+        "pct": 20.72,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 57,
+        "pct": 15.75,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 39,
+        "pct": 10.77,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.55,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 6,
+        "pct": 1.66,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 5,
+        "pct": 1.38,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 121,
+        "pct": 33.43,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Not answered",
+        "total": 362,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 42,
+        "pct": 7.68,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 83,
+        "pct": 15.17,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 84,
+        "pct": 15.36,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 169,
+        "pct": 30.9,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 117,
+        "pct": 21.39,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 6,
+        "pct": 1.1,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.37,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 28,
+        "pct": 5.12,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 16,
+        "pct": 2.93,
+        "subgroup": "eu_referendum",
+        "subgroup_value": "Remain",
+        "total": 547,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 59,
+        "pct": 19.6,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 68,
+        "pct": 22.59,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 30,
+        "pct": 9.97,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 71,
+        "pct": 23.59,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 54,
+        "pct": 17.94,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.66,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 1,
+        "pct": 0.33,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 11,
+        "pct": 3.65,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 5,
+        "pct": 1.66,
+        "subgroup": "political_interest",
+        "subgroup_value": "A great deal",
+        "total": 301,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 5,
+        "pct": 6.58,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 12,
+        "pct": 15.79,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 6,
+        "pct": 7.89,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 2,
+        "pct": 2.63,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 1.32,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 2,
+        "pct": 2.63,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 48,
+        "pct": 63.16,
+        "subgroup": "political_interest",
+        "subgroup_value": "None at all",
+        "total": 76,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 17,
+        "pct": 7.73,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 21,
+        "pct": 9.55,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 54,
+        "pct": 24.55,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 39,
+        "pct": 17.73,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 7,
+        "pct": 3.18,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 4,
+        "pct": 1.82,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 4,
+        "pct": 1.82,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 7,
+        "pct": 3.18,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 67,
+        "pct": 30.45,
+        "subgroup": "political_interest",
+        "subgroup_value": "Not very much",
+        "total": 220,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 76,
+        "pct": 16.93,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 87,
+        "pct": 19.38,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 77,
+        "pct": 17.15,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 110,
+        "pct": 24.5,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 64,
+        "pct": 14.25,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 4,
+        "pct": 0.89,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 1,
+        "pct": 0.22,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 13,
+        "pct": 2.9,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 17,
+        "pct": 3.79,
+        "subgroup": "political_interest",
+        "subgroup_value": "Quite a lot",
+        "total": 449,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 67,
+        "pct": 15.88,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 84,
+        "pct": 19.91,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 103,
+        "pct": 24.41,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 67,
+        "pct": 15.88,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 52,
+        "pct": 12.32,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.24,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.47,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 10,
+        "pct": 2.37,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 36,
+        "pct": 8.53,
+        "subgroup": "political_interest",
+        "subgroup_value": "Some",
+        "total": 422,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 13,
+        "pct": 7.78,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 23,
+        "pct": 13.77,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 22,
+        "pct": 13.17,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 46,
+        "pct": 27.54,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 26,
+        "pct": 15.57,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.6,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 7,
+        "pct": 4.19,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 29,
+        "pct": 17.37,
+        "subgroup": "age_band",
+        "subgroup_value": "18-24",
+        "total": 167,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 19,
+        "pct": 9.18,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 22,
+        "pct": 10.63,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 34,
+        "pct": 16.43,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 65,
+        "pct": 31.4,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 23,
+        "pct": 11.11,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.97,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 6,
+        "pct": 2.9,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 36,
+        "pct": 17.39,
+        "subgroup": "age_band",
+        "subgroup_value": "25-34",
+        "total": 207,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 41,
+        "pct": 14.59,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 42,
+        "pct": 14.95,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 57,
+        "pct": 20.28,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 65,
+        "pct": 23.13,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 27,
+        "pct": 9.61,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 3,
+        "pct": 1.07,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.71,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 12,
+        "pct": 4.27,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 32,
+        "pct": 11.39,
+        "subgroup": "age_band",
+        "subgroup_value": "35-44",
+        "total": 281,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 47,
+        "pct": 16.97,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 36,
+        "pct": 13.0,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 59,
+        "pct": 21.3,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 52,
+        "pct": 18.77,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 34,
+        "pct": 12.27,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 3,
+        "pct": 1.08,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.72,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 10,
+        "pct": 3.61,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 34,
+        "pct": 12.27,
+        "subgroup": "age_band",
+        "subgroup_value": "45-54",
+        "total": 277,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 43,
+        "pct": 19.55,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 47,
+        "pct": 21.36,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 43,
+        "pct": 19.55,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 33,
+        "pct": 15.0,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 31,
+        "pct": 14.09,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.45,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.91,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 4,
+        "pct": 1.82,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 16,
+        "pct": 7.27,
+        "subgroup": "age_band",
+        "subgroup_value": "55-64",
+        "total": 220,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 56,
+        "pct": 17.72,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 95,
+        "pct": 30.06,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 61,
+        "pct": 19.3,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 32,
+        "pct": 10.13,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 38,
+        "pct": 12.03,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.63,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.63,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 4,
+        "pct": 1.27,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 26,
+        "pct": 8.23,
+        "subgroup": "age_band",
+        "subgroup_value": "65+",
+        "total": 316,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 19,
+        "pct": 16.81,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 24,
+        "pct": 21.24,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 21,
+        "pct": 18.58,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 17,
+        "pct": 15.04,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 13,
+        "pct": 11.5,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 19,
+        "pct": 16.81,
+        "subgroup": "region",
+        "subgroup_value": "East Midlands",
+        "total": 113,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 30,
+        "pct": 19.74,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 31,
+        "pct": 20.39,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 30,
+        "pct": 19.74,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 27,
+        "pct": 17.76,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 18,
+        "pct": 11.84,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.66,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 15,
+        "pct": 9.87,
+        "subgroup": "region",
+        "subgroup_value": "East of England",
+        "total": 152,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 25,
+        "pct": 11.31,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 48,
+        "pct": 21.72,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 37,
+        "pct": 16.74,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 55,
+        "pct": 24.89,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 34,
+        "pct": 15.38,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.9,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 20,
+        "pct": 9.05,
+        "subgroup": "region",
+        "subgroup_value": "London",
+        "total": 221,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 9,
+        "pct": 16.36,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 11,
+        "pct": 20.0,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 9,
+        "pct": 16.36,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 13,
+        "pct": 23.64,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 7,
+        "pct": 12.73,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 6,
+        "pct": 10.91,
+        "subgroup": "region",
+        "subgroup_value": "North East",
+        "total": 55,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 26,
+        "pct": 16.56,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 22,
+        "pct": 14.01,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 27,
+        "pct": 17.2,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 44,
+        "pct": 28.03,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 15,
+        "pct": 9.55,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.64,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 22,
+        "pct": 14.01,
+        "subgroup": "region",
+        "subgroup_value": "North West",
+        "total": 157,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 10,
+        "pct": 8.06,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 17,
+        "pct": 13.71,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 22,
+        "pct": 17.74,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 13,
+        "pct": 10.48,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 12,
+        "pct": 9.68,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 43,
+        "pct": 34.68,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 7,
+        "pct": 5.65,
+        "subgroup": "region",
+        "subgroup_value": "Scotland",
+        "total": 124,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 31,
+        "pct": 16.58,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 26,
+        "pct": 13.9,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 38,
+        "pct": 20.32,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 38,
+        "pct": 20.32,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 32,
+        "pct": 17.11,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 1.07,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 20,
+        "pct": 10.7,
+        "subgroup": "region",
+        "subgroup_value": "South East",
+        "total": 187,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 28,
+        "pct": 20.9,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 24,
+        "pct": 17.91,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 27,
+        "pct": 20.15,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 19,
+        "pct": 14.18,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 21,
+        "pct": 15.67,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 1.49,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 13,
+        "pct": 9.7,
+        "subgroup": "region",
+        "subgroup_value": "South West",
+        "total": 134,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 9,
+        "pct": 12.5,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 16,
+        "pct": 22.22,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 10,
+        "pct": 13.89,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 12,
+        "pct": 16.67,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 5,
+        "pct": 6.94,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 11,
+        "pct": 15.28,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 9,
+        "pct": 12.5,
+        "subgroup": "region",
+        "subgroup_value": "Wales",
+        "total": 72,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 14,
+        "pct": 10.94,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 26,
+        "pct": 20.31,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 27,
+        "pct": 21.09,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 28,
+        "pct": 21.88,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 11,
+        "pct": 8.59,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 22,
+        "pct": 17.19,
+        "subgroup": "region",
+        "subgroup_value": "West Midlands",
+        "total": 128,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 18,
+        "pct": 14.4,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 20,
+        "pct": 16.0,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 28,
+        "pct": 22.4,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 27,
+        "pct": 21.6,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 11,
+        "pct": 8.8,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.8,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 20,
+        "pct": 16.0,
+        "subgroup": "region",
+        "subgroup_value": "Yorkshire and the Humber",
+        "total": 125,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 19,
+        "pct": 13.97,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 28,
+        "pct": 20.59,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 34,
+        "pct": 25.0,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 15,
+        "pct": 11.03,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 14,
+        "pct": 10.29,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 4,
+        "pct": 2.94,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 5,
+        "pct": 3.68,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 17,
+        "pct": 12.5,
+        "subgroup": "income",
+        "subgroup_value": "Prefer not to answer",
+        "total": 136,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 8,
+        "pct": 11.43,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 5,
+        "pct": 7.14,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 20,
+        "pct": 28.57,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 11,
+        "pct": 15.71,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 9,
+        "pct": 12.86,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 1.43,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 1,
+        "pct": 1.43,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 4,
+        "pct": 5.71,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 11,
+        "pct": 15.71,
+        "subgroup": "income",
+        "subgroup_value": "Up to \u00a37,000",
+        "total": 70,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 51,
+        "pct": 19.77,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 42,
+        "pct": 16.28,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 35,
+        "pct": 13.57,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 63,
+        "pct": 24.42,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 35,
+        "pct": 13.57,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 0.78,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 2,
+        "pct": 0.78,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 7,
+        "pct": 2.71,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 21,
+        "pct": 8.14,
+        "subgroup": "income",
+        "subgroup_value": "\u00a314,001 to \u00a321,000",
+        "total": 258,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 39,
+        "pct": 15.79,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 45,
+        "pct": 18.22,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 46,
+        "pct": 18.62,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 58,
+        "pct": 23.48,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 22,
+        "pct": 8.91,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 0.4,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 5,
+        "pct": 2.02,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 31,
+        "pct": 12.55,
+        "subgroup": "income",
+        "subgroup_value": "\u00a321,001 to \u00a328,000",
+        "total": 247,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 24,
+        "pct": 13.95,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 36,
+        "pct": 20.93,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 32,
+        "pct": 18.6,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 34,
+        "pct": 19.77,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 18,
+        "pct": 10.47,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 4,
+        "pct": 2.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 7,
+        "pct": 4.07,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 17,
+        "pct": 9.88,
+        "subgroup": "income",
+        "subgroup_value": "\u00a328,001 to \u00a334,000",
+        "total": 172,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 21,
+        "pct": 13.04,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 32,
+        "pct": 19.88,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 31,
+        "pct": 19.25,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 30,
+        "pct": 18.63,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 22,
+        "pct": 13.66,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 2,
+        "pct": 1.24,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Rather not say"
+      },
+      {
+        "count": 4,
+        "pct": 2.48,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 19,
+        "pct": 11.8,
+        "subgroup": "income",
+        "subgroup_value": "\u00a334,001 to \u00a341,000",
+        "total": 161,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 9,
+        "pct": 10.34,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 21,
+        "pct": 24.14,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 23,
+        "pct": 26.44,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 8,
+        "pct": 9.2,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 13,
+        "pct": 14.94,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 3,
+        "pct": 3.45,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 10,
+        "pct": 11.49,
+        "subgroup": "income",
+        "subgroup_value": "\u00a341,001 to \u00a348,000",
+        "total": 87,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 10,
+        "pct": 17.86,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 12,
+        "pct": 21.43,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 3,
+        "pct": 5.36,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 17,
+        "pct": 30.36,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 7,
+        "pct": 12.5,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 7,
+        "pct": 12.5,
+        "subgroup": "income",
+        "subgroup_value": "\u00a348,001 to \u00a355,000",
+        "total": 56,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 4,
+        "pct": 19.05,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 6,
+        "pct": 28.57,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 4,
+        "pct": 19.05,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 4,
+        "pct": 19.05,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 4.76,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 2,
+        "pct": 9.52,
+        "subgroup": "income",
+        "subgroup_value": "\u00a355,001 to \u00a362,000",
+        "total": 21,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 3,
+        "pct": 20.0,
+        "subgroup": "income",
+        "subgroup_value": "\u00a362,001 to \u00a369,000",
+        "total": 15,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 3,
+        "pct": 20.0,
+        "subgroup": "income",
+        "subgroup_value": "\u00a362,001 to \u00a369,000",
+        "total": 15,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 4,
+        "pct": 26.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a362,001 to \u00a369,000",
+        "total": 15,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 4,
+        "pct": 26.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a362,001 to \u00a369,000",
+        "total": 15,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 6.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a362,001 to \u00a369,000",
+        "total": 15,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 1,
+        "pct": 8.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 2,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 2,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 2,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 4,
+        "pct": 33.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 8.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a369,001 to \u00a376,000",
+        "total": 12,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 29,
+        "pct": 14.95,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 23,
+        "pct": 11.86,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 37,
+        "pct": 19.07,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 45,
+        "pct": 23.2,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 20,
+        "pct": 10.31,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 3,
+        "pct": 1.55,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Plaid Cymru"
+      },
+      {
+        "count": 7,
+        "pct": 3.61,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "SNP"
+      },
+      {
+        "count": 30,
+        "pct": 15.46,
+        "subgroup": "income",
+        "subgroup_value": "\u00a37,001 to \u00a314,000",
+        "total": 194,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 3,
+        "pct": 33.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a376,001 to \u00a383,000",
+        "total": 9,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 2,
+        "pct": 22.22,
+        "subgroup": "income",
+        "subgroup_value": "\u00a376,001 to \u00a383,000",
+        "total": 9,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 1,
+        "pct": 11.11,
+        "subgroup": "income",
+        "subgroup_value": "\u00a376,001 to \u00a383,000",
+        "total": 9,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 2,
+        "pct": 22.22,
+        "subgroup": "income",
+        "subgroup_value": "\u00a376,001 to \u00a383,000",
+        "total": 9,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 1,
+        "pct": 11.11,
+        "subgroup": "income",
+        "subgroup_value": "\u00a376,001 to \u00a383,000",
+        "total": 9,
+        "vote_intention": "Would not vote"
+      },
+      {
+        "count": 1,
+        "pct": 3.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Another party"
+      },
+      {
+        "count": 10,
+        "pct": 33.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Conservative"
+      },
+      {
+        "count": 4,
+        "pct": 13.33,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Don't know"
+      },
+      {
+        "count": 5,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Labour"
+      },
+      {
+        "count": 5,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Liberal Democrat"
+      },
+      {
+        "count": 5,
+        "pct": 16.67,
+        "subgroup": "income",
+        "subgroup_value": "\u00a383,001 or more",
+        "total": 30,
+        "vote_intention": "Would not vote"
+      }
+    ]
+  },
+  "encoding": {
+    "color": {
+      "field": "vote_intention",
+      "legend": {
+        "title": "Vote Intention",
+        "values": [
+          "Labour",
+          "Conservative",
+          "Liberal Democrat",
+          "SNP",
+          "Plaid Cymru",
+          "Another party",
+          "Don't know",
+          "Would not vote",
+          "Rather not say"
+        ]
+      },
+      "scale": {
+        "domain": [
+          "Labour",
+          "Conservative",
+          "Liberal Democrat",
+          "SNP",
+          "Plaid Cymru",
+          "Another party",
+          "Don't know",
+          "Would not vote",
+          "Rather not say"
+        ],
+        "range": [
+          "#E4003B",
+          "#0087DC",
+          "#FAA61A",
+          "#FDF38E",
+          "#005B54",
+          "#B0B0B0",
+          "#888888",
+          "#505050",
+          "#505050"
+        ]
+      },
+      "type": "nominal"
+    },
+    "tooltip": [
+      {
+        "field": "subgroup_value",
+        "title": "Group",
+        "type": "nominal"
+      },
+      {
+        "field": "vote_intention",
+        "title": "Party",
+        "type": "nominal"
+      },
+      {
+        "field": "count",
+        "title": "Respondents",
+        "type": "quantitative"
+      },
+      {
+        "field": "pct",
+        "format": ".2f",
+        "title": "Share (%)",
+        "type": "quantitative"
+      }
+    ],
+    "x": {
+      "axis": {
+        "grid": false,
+        "title": "% of Respondents"
+      },
+      "field": "pct",
+      "scale": {
+        "domain": [
+          0,
+          100
+        ]
+      },
+      "type": "quantitative"
+    },
+    "y": {
+      "axis": {
+        "grid": false,
+        "title": ""
+      },
+      "field": "subgroup_value",
+      "type": "nominal"
+    }
+  },
+  "height": 400,
+  "mark": {
+    "type": "bar"
+  },
+  "padding": {
+    "left": 50
+  },
+  "params": [
+    {
+      "bind": {
+        "input": "select",
+        "labels": [
+          "EU Referendum",
+          "Political Interest",
+          "Age Band",
+          "Region",
+          "Income"
+        ],
+        "name": "Explore by: ",
+        "options": [
+          "eu_referendum",
+          "political_interest",
+          "age_band",
+          "region",
+          "income"
+        ]
+      },
+      "name": "param_1",
+      "select": {
+        "fields": [
+          "subgroup"
+        ],
+        "type": "point"
+      },
+      "value": "political_interest"
+    }
+  ],
+  "title": {
+    "anchor": "start",
+    "fontSize": 15,
+    "fontWeight": "bold",
+    "subtitle": [
+      "Use the dropdown to explore patterns across different subgroups",
+      ""
+    ],
+    "subtitleFontSize": 13,
+    "text": "Voting intention varies significantly across demographic and attitudinal groups"
+  },
+  "transform": [
+    {
+      "filter": {
+        "param": "param_1"
+      }
+    }
+  ],
+  "width": 600
+}, {actions: false});
+        vegaEmbed('#predictors', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-6f121298c0a00754495e5cb360b9998d"
+  },
+  "datasets": {
+    "data-6f121298c0a00754495e5cb360b9998d": [
+      {
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "mean_abs_coef": 0.49938875020520357
+      },
+      {
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "mean_abs_coef": 0.44063548996396734
+      },
+      {
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "mean_abs_coef": 0.4180558228030776
+      },
+      {
+        "feature": "eu_referendum_Not answered",
+        "feature_label": "EU Referendum: Not Answered",
+        "mean_abs_coef": 0.30445201488348933
+      },
+      {
+        "feature": "region_Wales",
+        "feature_label": "Region: Wales",
+        "mean_abs_coef": 0.2888757460263269
+      },
+      {
+        "feature": "att_big_business_encoded",
+        "feature_label": "Agrees: Big Business",
+        "mean_abs_coef": 0.28568140940215186
+      },
+      {
+        "feature": "stmt_parents_nearby_encoded",
+        "feature_label": "Applies: Parents Nearby",
+        "mean_abs_coef": 0.28220876020991637
+      },
+      {
+        "feature": "att_international_partnerships_encoded",
+        "feature_label": "Agrees: International Partnerships",
+        "mean_abs_coef": 0.2766920419831915
+      },
+      {
+        "feature": "att_poverty_priority_encoded",
+        "feature_label": "Agrees: Poverty Priority",
+        "mean_abs_coef": 0.2531583231345883
+      },
+      {
+        "feature": "income_encoded",
+        "feature_label": "Income",
+        "mean_abs_coef": 0.24655028204127666
+      },
+      {
+        "feature": "goal_importance_Good health and well-being",
+        "feature_label": "Goal: Good Health And Well-Being",
+        "mean_abs_coef": 0.2459628860234526
+      },
+      {
+        "feature": "stmt_public_transport_encoded",
+        "feature_label": "Applies: Public Transport",
+        "mean_abs_coef": 0.2401579278664586
+      },
+      {
+        "feature": "eu_referendum_Leave",
+        "feature_label": "EU Referendum: Leave",
+        "mean_abs_coef": 0.23851543693884458
+      },
+      {
+        "feature": "goal_importance_Eliminating global poverty",
+        "feature_label": "Goal: Eliminating Global Poverty",
+        "mean_abs_coef": 0.2286424630310263
+      },
+      {
+        "feature": "eu_referendum_Remain",
+        "feature_label": "EU Referendum: Remain",
+        "mean_abs_coef": 0.22462772906056502
+      },
+      {
+        "feature": "att_defence_cuts_encoded",
+        "feature_label": "Agrees: Defence Cuts",
+        "mean_abs_coef": 0.22350126107216597
+      },
+      {
+        "feature": "work_organisation_Other",
+        "feature_label": "Work Organisation Other",
+        "mean_abs_coef": 0.220962543805056
+      },
+      {
+        "feature": "goal_importance_Stopping climate change",
+        "feature_label": "Goal: Stopping Climate Change",
+        "mean_abs_coef": 0.21441045573907416
+      },
+      {
+        "feature": "stmt_travel_abroad_encoded",
+        "feature_label": "Applies: Travel Abroad",
+        "mean_abs_coef": 0.20742314900319883
+      },
+      {
+        "feature": "att_british_first_encoded",
+        "feature_label": "Agrees: British First",
+        "mean_abs_coef": 0.20722572705331604
+      }
+    ]
+  },
+  "encoding": {
+    "tooltip": [
+      {
+        "field": "feature_label",
+        "title": "Feature",
+        "type": "nominal"
+      },
+      {
+        "field": "mean_abs_coef",
+        "format": ".3f",
+        "title": "Mean Absolute Coefficient",
+        "type": "quantitative"
+      }
+    ],
+    "x": {
+      "axis": {
+        "grid": false,
+        "title": "Mean Absolute Coefficient"
+      },
+      "field": "mean_abs_coef",
+      "type": "quantitative"
+    },
+    "y": {
+      "axis": {
+        "grid": false,
+        "title": ""
+      },
+      "field": "feature_label",
+      "sort": "-x",
+      "type": "nominal"
+    }
+  },
+  "height": 500,
+  "mark": {
+    "type": "bar"
+  },
+  "title": {
+    "anchor": "start",
+    "fontSize": 15,
+    "fontWeight": "bold",
+    "subtitle": [
+      "Averaged across all parties, these three features score 0.42-0.50, well above the next predictor at 0.30",
+      ""
+    ],
+    "subtitleFontSize": 13,
+    "text": "Scotland, political engagement, and health status are the strongest predictors of voting intention"
+  },
+  "width": 600
+}, {actions: false});
+        vegaEmbed('#coef', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-2fab602dbdbc0865ff4edcdfa32b50d0"
+  },
+  "datasets": {
+    "data-2fab602dbdbc0865ff4edcdfa32b50d0": [
+      {
+        "abs_coefficient": 2.2472493759234196,
+        "coefficient": 2.2472493759234196,
+        "direction": "Increases likelihood",
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 1.2999408571184712,
+        "coefficient": 1.2999408571184712,
+        "direction": "Increases likelihood",
+        "feature": "region_Wales",
+        "feature_label": "Region: Wales",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 1.0001094063170843,
+        "coefficient": -1.0001094063170843,
+        "direction": "Decreases likelihood",
+        "feature": "goal_importance_Good health and well-being",
+        "feature_label": "Goal: Good Health And Well-Being",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.9321892618074655,
+        "coefficient": 0.9321892618074655,
+        "direction": "Increases likelihood",
+        "feature": "stmt_travel_abroad_encoded",
+        "feature_label": "Applies: Travel Abroad",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.9030154747677751,
+        "coefficient": -0.9030154747677751,
+        "direction": "Decreases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.8711505408215368,
+        "coefficient": -0.8711505408215368,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_parents_nearby_encoded",
+        "feature_label": "Applies: Parents Nearby",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.8333709206401764,
+        "coefficient": 0.8333709206401764,
+        "direction": "Increases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.8311262646651043,
+        "coefficient": 0.8311262646651043,
+        "direction": "Increases likelihood",
+        "feature": "income_prefer_not_to_answer",
+        "feature_label": "Prefers Not To Share Income",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.752198977658635,
+        "coefficient": -0.752198977658635,
+        "direction": "Decreases likelihood",
+        "feature": "income_encoded",
+        "feature_label": "Income",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.7486045964906113,
+        "coefficient": 0.7486045964906113,
+        "direction": "Increases likelihood",
+        "feature": "att_international_partnerships_encoded",
+        "feature_label": "Agrees: International Partnerships",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.7462183237823217,
+        "coefficient": 0.7462183237823217,
+        "direction": "Increases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.6263768113137301,
+        "coefficient": 0.6263768113137301,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Eliminating global poverty",
+        "feature_label": "Goal: Eliminating Global Poverty",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.620903921670526,
+        "coefficient": 0.620903921670526,
+        "direction": "Increases likelihood",
+        "feature": "att_british_first_encoded",
+        "feature_label": "Agrees: British First",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.6100922472447078,
+        "coefficient": 0.6100922472447078,
+        "direction": "Increases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.6023526125432604,
+        "coefficient": 0.6023526125432604,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Stopping climate change",
+        "feature_label": "Goal: Stopping Climate Change",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.599015314728292,
+        "coefficient": 0.599015314728292,
+        "direction": "Increases likelihood",
+        "feature": "eu_referendum_Not answered",
+        "feature_label": "EU Referendum: Not Answered",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.5931948837134973,
+        "coefficient": 0.5931948837134973,
+        "direction": "Increases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.589998199865067,
+        "coefficient": -0.589998199865067,
+        "direction": "Decreases likelihood",
+        "feature": "att_international_partnerships_encoded",
+        "feature_label": "Agrees: International Partnerships",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.577332879573777,
+        "coefficient": 0.577332879573777,
+        "direction": "Increases likelihood",
+        "feature": "stmt_parents_nearby_encoded",
+        "feature_label": "Applies: Parents Nearby",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.566484277773749,
+        "coefficient": 0.566484277773749,
+        "direction": "Increases likelihood",
+        "feature": "working_status_Working full time - working 30 hours per week or more",
+        "feature_label": "Working Status: Working Full Time - Working 30 Hours Per Week Or More",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.56260366830458,
+        "coefficient": -0.56260366830458,
+        "direction": "Decreases likelihood",
+        "feature": "goal_importance_Eliminating global poverty",
+        "feature_label": "Goal: Eliminating Global Poverty",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.562218135048919,
+        "coefficient": 0.562218135048919,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Good health and well-being",
+        "feature_label": "Goal: Good Health And Well-Being",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.5594658485579537,
+        "coefficient": -0.5594658485579537,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_lived_abroad_encoded",
+        "feature_label": "Applies: Lived Abroad",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.5594554549450904,
+        "coefficient": 0.5594554549450904,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Ensuring nobody goes hungry",
+        "feature_label": "Goal: Ensuring Nobody Goes Hungry",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.5521837714411707,
+        "coefficient": -0.5521837714411707,
+        "direction": "Decreases likelihood",
+        "feature": "working_status_Retired with a private pension",
+        "feature_label": "Working Status: Retired With A Private Pension",
+        "party": "SNP"
+      },
+      {
+        "abs_coefficient": 0.5416567079563319,
+        "coefficient": 0.5416567079563319,
+        "direction": "Increases likelihood",
+        "feature": "eu_referendum_Leave",
+        "feature_label": "EU Referendum: Leave",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.5403946150307516,
+        "coefficient": 0.5403946150307516,
+        "direction": "Increases likelihood",
+        "feature": "stmt_lived_london_encoded",
+        "feature_label": "Applies: Lived London",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.5401601419993808,
+        "coefficient": -0.5401601419993808,
+        "direction": "Decreases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.5256907029029042,
+        "coefficient": -0.5256907029029042,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_public_transport_encoded",
+        "feature_label": "Applies: Public Transport",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.5137474724866777,
+        "coefficient": -0.5137474724866777,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_cognitive_work_encoded",
+        "feature_label": "Applies: Cognitive Work",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.4993949803190959,
+        "coefficient": 0.4993949803190959,
+        "direction": "Increases likelihood",
+        "feature": "att_working_class_encoded",
+        "feature_label": "Agrees: Working Class",
+        "party": "Rather not say"
+      },
+      {
+        "abs_coefficient": 0.49525260313039327,
+        "coefficient": 0.49525260313039327,
+        "direction": "Increases likelihood",
+        "feature": "att_big_business_encoded",
+        "feature_label": "Agrees: Big Business",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.4946403338411973,
+        "coefficient": -0.4946403338411973,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.48248636247761933,
+        "coefficient": 0.48248636247761933,
+        "direction": "Increases likelihood",
+        "feature": "att_defence_cuts_encoded",
+        "feature_label": "Agrees: Defence Cuts",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.47965620748977605,
+        "coefficient": -0.47965620748977605,
+        "direction": "Decreases likelihood",
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.47639269978329735,
+        "coefficient": 0.47639269978329735,
+        "direction": "Increases likelihood",
+        "feature": "income_encoded",
+        "feature_label": "Income",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.4658063189221838,
+        "coefficient": 0.4658063189221838,
+        "direction": "Increases likelihood",
+        "feature": "work_organisation_Self-employed",
+        "feature_label": "Work Organisation Self-Employed",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.46098106366437286,
+        "coefficient": 0.46098106366437286,
+        "direction": "Increases likelihood",
+        "feature": "att_poverty_priority_encoded",
+        "feature_label": "Agrees: Poverty Priority",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.45820572565317885,
+        "coefficient": -0.45820572565317885,
+        "direction": "Decreases likelihood",
+        "feature": "att_big_business_encoded",
+        "feature_label": "Agrees: Big Business",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.4462045349125845,
+        "coefficient": 0.4462045349125845,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Peace, justice, and strong institutions",
+        "feature_label": "Goal: Peace, Justice, And Strong Institutions",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.42431820804052733,
+        "coefficient": -0.42431820804052733,
+        "direction": "Decreases likelihood",
+        "feature": "att_british_first_encoded",
+        "feature_label": "Agrees: British First",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.41992631465855296,
+        "coefficient": 0.41992631465855296,
+        "direction": "Increases likelihood",
+        "feature": "stmt_manual_labour_encoded",
+        "feature_label": "Applies: Manual Labour",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.4191409375309736,
+        "coefficient": 0.4191409375309736,
+        "direction": "Increases likelihood",
+        "feature": "stmt_public_transport_encoded",
+        "feature_label": "Applies: Public Transport",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.41770710332779687,
+        "coefficient": -0.41770710332779687,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.40681537619230546,
+        "coefficient": -0.40681537619230546,
+        "direction": "Decreases likelihood",
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.40546727759475265,
+        "coefficient": 0.40546727759475265,
+        "direction": "Increases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.4054530692412373,
+        "coefficient": -0.4054530692412373,
+        "direction": "Decreases likelihood",
+        "feature": "work_organisation_Nationalised industry or public corporation (e.g. Post Office)",
+        "feature_label": "Work Organisation Nationalised Industry Or Public Corporation (E.G. Post Office)",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.40190037178838095,
+        "coefficient": -0.40190037178838095,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_public_transport_encoded",
+        "feature_label": "Applies: Public Transport",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.39613687867264746,
+        "coefficient": -0.39613687867264746,
+        "direction": "Decreases likelihood",
+        "feature": "age",
+        "feature_label": "Age",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.393967378491028,
+        "coefficient": -0.393967378491028,
+        "direction": "Decreases likelihood",
+        "feature": "work_organisation_Have never worked",
+        "feature_label": "Work Organisation Have Never Worked",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.39015262045975824,
+        "coefficient": 0.39015262045975824,
+        "direction": "Increases likelihood",
+        "feature": "att_welfare_reliance_encoded",
+        "feature_label": "Agrees: Welfare Reliance",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.3873178058615283,
+        "coefficient": 0.3873178058615283,
+        "direction": "Increases likelihood",
+        "feature": "working_status_Retired on a state pension only",
+        "feature_label": "Working Status: Retired On A State Pension Only",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.3824439374550093,
+        "coefficient": -0.3824439374550093,
+        "direction": "Decreases likelihood",
+        "feature": "att_defence_cuts_encoded",
+        "feature_label": "Agrees: Defence Cuts",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.381770090157908,
+        "coefficient": -0.381770090157908,
+        "direction": "Decreases likelihood",
+        "feature": "eu_referendum_Remain",
+        "feature_label": "EU Referendum: Remain",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.3786595888487577,
+        "coefficient": 0.3786595888487577,
+        "direction": "Increases likelihood",
+        "feature": "att_britain_greatest_encoded",
+        "feature_label": "Agrees: Britain Greatest",
+        "party": "Plaid Cymru"
+      },
+      {
+        "abs_coefficient": 0.3685505548842218,
+        "coefficient": 0.3685505548842218,
+        "direction": "Increases likelihood",
+        "feature": "political_interest_encoded",
+        "feature_label": "Political Interest",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.36701365950619275,
+        "coefficient": -0.36701365950619275,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_carer_encoded",
+        "feature_label": "Applies: Carer",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.3490914998429196,
+        "coefficient": 0.3490914998429196,
+        "direction": "Increases likelihood",
+        "feature": "att_poverty_priority_encoded",
+        "feature_label": "Agrees: Poverty Priority",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.3470961606639617,
+        "coefficient": -0.3470961606639617,
+        "direction": "Decreases likelihood",
+        "feature": "goal_importance_Gender equality",
+        "feature_label": "Goal: Gender Equality",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.3438348325139902,
+        "coefficient": -0.3438348325139902,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_one_parent_household_encoded",
+        "feature_label": "Applies: One Parent Household",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.3380505979664296,
+        "coefficient": -0.3380505979664296,
+        "direction": "Decreases likelihood",
+        "feature": "working_status_Working part time - working between 8 and 29 hours per week",
+        "feature_label": "Working Status: Working Part Time - Working Between 8 And 29 Hours Per Week",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.336040398386828,
+        "coefficient": 0.336040398386828,
+        "direction": "Increases likelihood",
+        "feature": "gender_Female",
+        "feature_label": "Gender Female",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.3354677023441047,
+        "coefficient": 0.3354677023441047,
+        "direction": "Increases likelihood",
+        "feature": "work_organisation_Other",
+        "feature_label": "Work Organisation Other",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.3341676572464991,
+        "coefficient": -0.3341676572464991,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.33307583215034503,
+        "coefficient": 0.33307583215034503,
+        "direction": "Increases likelihood",
+        "feature": "eu_referendum_Remain",
+        "feature_label": "EU Referendum: Remain",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.3290983060957715,
+        "coefficient": -0.3290983060957715,
+        "direction": "Decreases likelihood",
+        "feature": "goal_importance_Partnerships between countries to achieve these goals",
+        "feature_label": "Goal: Partnerships Between Countries To Achieve These Goals",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.3235841183086701,
+        "coefficient": 0.3235841183086701,
+        "direction": "Increases likelihood",
+        "feature": "income_encoded",
+        "feature_label": "Income",
+        "party": "Would not vote"
+      },
+      {
+        "abs_coefficient": 0.32011791032579606,
+        "coefficient": -0.32011791032579606,
+        "direction": "Decreases likelihood",
+        "feature": "goal_importance_Gender equality",
+        "feature_label": "Goal: Gender Equality",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.31791839414664064,
+        "coefficient": 0.31791839414664064,
+        "direction": "Increases likelihood",
+        "feature": "att_poverty_priority_encoded",
+        "feature_label": "Agrees: Poverty Priority",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.31465404287164667,
+        "coefficient": -0.31465404287164667,
+        "direction": "Decreases likelihood",
+        "feature": "att_big_business_encoded",
+        "feature_label": "Agrees: Big Business",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.31335839686969785,
+        "coefficient": 0.31335839686969785,
+        "direction": "Increases likelihood",
+        "feature": "eu_referendum_Leave",
+        "feature_label": "EU Referendum: Leave",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.3109910186010147,
+        "coefficient": -0.3109910186010147,
+        "direction": "Decreases likelihood",
+        "feature": "eu_referendum_Leave",
+        "feature_label": "EU Referendum: Leave",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.3021658567133403,
+        "coefficient": -0.3021658567133403,
+        "direction": "Decreases likelihood",
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "party": "Liberal Democrat"
+      },
+      {
+        "abs_coefficient": 0.3012467177376552,
+        "coefficient": -0.3012467177376552,
+        "direction": "Decreases likelihood",
+        "feature": "eu_referendum_Not answered",
+        "feature_label": "EU Referendum: Not Answered",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.29894554845572185,
+        "coefficient": -0.29894554845572185,
+        "direction": "Decreases likelihood",
+        "feature": "eu_referendum_Remain",
+        "feature_label": "EU Referendum: Remain",
+        "party": "Another party"
+      },
+      {
+        "abs_coefficient": 0.2904635178683471,
+        "coefficient": 0.2904635178683471,
+        "direction": "Increases likelihood",
+        "feature": "att_immigration_priority_encoded",
+        "feature_label": "Agrees: Immigration Priority",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.28935839764239013,
+        "coefficient": -0.28935839764239013,
+        "direction": "Decreases likelihood",
+        "feature": "eu_referendum_Not answered",
+        "feature_label": "EU Referendum: Not Answered",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.27910208058573344,
+        "coefficient": -0.27910208058573344,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.2768055898139483,
+        "coefficient": -0.2768055898139483,
+        "direction": "Decreases likelihood",
+        "feature": "income_prefer_not_to_answer",
+        "feature_label": "Prefers Not To Share Income",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.27556427376586723,
+        "coefficient": 0.27556427376586723,
+        "direction": "Increases likelihood",
+        "feature": "eu_referendum_Remain",
+        "feature_label": "EU Referendum: Remain",
+        "party": "Labour"
+      },
+      {
+        "abs_coefficient": 0.2594204542029969,
+        "coefficient": -0.2594204542029969,
+        "direction": "Decreases likelihood",
+        "feature": "att_big_business_encoded",
+        "feature_label": "Agrees: Big Business",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.25648234652174234,
+        "coefficient": -0.25648234652174234,
+        "direction": "Decreases likelihood",
+        "feature": "stmt_health_disability_encoded",
+        "feature_label": "Applies: Health Disability",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.2524736078105014,
+        "coefficient": -0.2524736078105014,
+        "direction": "Decreases likelihood",
+        "feature": "region_Scotland",
+        "feature_label": "Region: Scotland",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.2504706936274975,
+        "coefficient": 0.2504706936274975,
+        "direction": "Increases likelihood",
+        "feature": "goal_importance_Decent work and economic growth",
+        "feature_label": "Goal: Decent Work And Economic Growth",
+        "party": "Conservative"
+      },
+      {
+        "abs_coefficient": 0.24410893596013836,
+        "coefficient": -0.24410893596013836,
+        "direction": "Decreases likelihood",
+        "feature": "att_british_first_encoded",
+        "feature_label": "Agrees: British First",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.18592786539647638,
+        "coefficient": -0.18592786539647638,
+        "direction": "Decreases likelihood",
+        "feature": "working_status_Retired on a state pension only",
+        "feature_label": "Working Status: Retired On A State Pension Only",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.1837366748076844,
+        "coefficient": 0.1837366748076844,
+        "direction": "Increases likelihood",
+        "feature": "region_West Midlands",
+        "feature_label": "Region: West Midlands",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.18356961002207817,
+        "coefficient": -0.18356961002207817,
+        "direction": "Decreases likelihood",
+        "feature": "att_welfare_reliance_encoded",
+        "feature_label": "Agrees: Welfare Reliance",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.1809097996086168,
+        "coefficient": 0.1809097996086168,
+        "direction": "Increases likelihood",
+        "feature": "income_encoded",
+        "feature_label": "Income",
+        "party": "Don't know"
+      },
+      {
+        "abs_coefficient": 0.17977755703194523,
+        "coefficient": 0.17977755703194523,
+        "direction": "Increases likelihood",
+        "feature": "work_organisation_Other",
+        "feature_label": "Work Organisation Other",
+        "party": "Don't know"
+      }
+    ]
+  },
+  "encoding": {
+    "color": {
+      "field": "direction",
+      "legend": {
+        "title": "Effect"
+      },
+      "scale": {
+        "domain": [
+          "Increases likelihood",
+          "Decreases likelihood"
+        ],
+        "range": [
+          "#4CAF50",
+          "#E57373"
+        ]
+      },
+      "type": "nominal"
+    },
+    "tooltip": [
+      {
+        "field": "feature_label",
+        "title": "Feature",
+        "type": "nominal"
+      },
+      {
+        "field": "coefficient",
+        "format": ".3f",
+        "title": "Coefficient",
+        "type": "quantitative"
+      },
+      {
+        "field": "direction",
+        "title": "Effect",
+        "type": "nominal"
+      }
+    ],
+    "x": {
+      "axis": {
+        "grid": false,
+        "title": "Coefficient"
+      },
+      "field": "coefficient",
+      "type": "quantitative"
+    },
+    "y": {
+      "axis": {
+        "grid": false,
+        "title": ""
+      },
+      "field": "feature_label",
+      "sort": {
+        "field": "abs_coefficient",
+        "order": "descending"
+      },
+      "type": "nominal"
+    }
+  },
+  "height": 400,
+  "mark": {
+    "type": "bar"
+  },
+  "padding": {
+    "left": 50
+  },
+  "params": [
+    {
+      "bind": {
+        "input": "select",
+        "name": "Select party: ",
+        "options": [
+          "Another party",
+          "Conservative",
+          "Don't know",
+          "Labour",
+          "Liberal Democrat",
+          "Plaid Cymru",
+          "Rather not say",
+          "SNP",
+          "Would not vote"
+        ]
+      },
+      "name": "param_2",
+      "select": {
+        "fields": [
+          "party"
+        ],
+        "type": "point"
+      },
+      "value": "Labour"
+    }
+  ],
+  "title": {
+    "anchor": "start",
+    "fontSize": 15,
+    "fontWeight": "bold",
+    "subtitle": [
+      "Use the dropdown to explore the top predictors for each party",
+      ""
+    ],
+    "subtitleFontSize": 13,
+    "text": "Each party is driven by a distinct combination of regional, attitudinal, and demographic factors"
+  },
+  "transform": [
+    {
+      "filter": {
+        "param": "param_2"
+      }
+    }
+  ],
+  "width": 600
+}, {actions: false});
+    </script>
+
+</body>
+</html>
