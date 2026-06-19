@@ -1,6 +1,7 @@
 # UK Voting Intention Survey Analysis
 
 SHGH Technical Task
+
 Tiffany Lam
 
 An analysis of a survey of 1,437 UK respondents examining voting intention and the demographic, attitudinal, and behavioural factors that predict it. A logistic regression model was trained to predict how respondents would vote if there was a general election tomorrow, with results presented in an interactive dashboard.
