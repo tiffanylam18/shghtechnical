@@ -76,7 +76,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn altair
 - Redundant features identified through the correlation check are dropped, leaving 86 features
 - Data is split 80/20 into training and test sets with stratification to preserve class distribution
 - Features are standardised using StandardScaler, fit on training data only to prevent data leakage
-- A logistic regression model with L2 regularisation is trained for multiclass classification across 8 voting intention classes
+- A logistic regression model with L2 regularisation is trained for multiclass classification across 9 voting intention classes
 - Model coefficients are extracted and interpreted at both the overall and per-party level
 - A Random Forest model is trained as an additional check
 
