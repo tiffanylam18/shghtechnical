@@ -68,7 +68,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn altair
 
 **3. Data Visuals**
 
-- Three visualisations are produced examining vote intention distribution, voting patterns by subgroup, and EU referendum vote vs voting intention
+- Three visualisations are produced examining vote intention distribution, voting patterns by political interest, and EU referendum vote vs voting intention
 
 **4. Modelling**
 
